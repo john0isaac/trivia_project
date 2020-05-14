@@ -42,21 +42,18 @@ def create_app(test_config=None):
   '''
   @app.route('/categories', methods=['GET'])
   def retrieve_categories():
-    success = False
     categories = {}
     try:
       selection = Category.query.order_by(Category.id).all()
       for category in selection:
             categories[category.id] = category.type
-      success = True
-    except:
-      success = False
-      abort(405)
-    finally:
       return jsonify({
-        'success': success,
+        'success': True,
         'categories': categories,
       })
+    except:
+      abort(405)
+
   '''
   @TODO:DONE
   Create an endpoint to handle GET requests for questions, 
@@ -71,12 +68,11 @@ def create_app(test_config=None):
   '''
   @app.route('/questions', methods=['GET'])
   def retrieve_questions():
-    success = False
     categories = {}
     current_category = []
     try:
       questions = Question.query.order_by(Question.category).all()
-      current_questions = pagination(request, questions)
+      current_questions = paginate_questions(request, questions)
       selection2 = Question.query.with_entities(Question.category).order_by(Question.category).all()
       for category in selection2:
           for innerlist in category:
@@ -84,19 +80,16 @@ def create_app(test_config=None):
       selection = Category.query.order_by(Category.id).all()
       for category in selection:
             categories[category.id] = category.type
-      success = True
-    except:
-      success = False
-      abort(405)
-    finally:
       return jsonify({
-        'success': success,
+        'success': True,
         'questions': current_questions,
         'total_questions': len(Question.query.all()),
         'categories': categories,
         'current_category': current_category
       })
-
+    except:
+      abort(405)
+ 
   '''
   @TODO: 
   Create an endpoint to DELETE question using a question ID. 
@@ -104,6 +97,17 @@ def create_app(test_config=None):
   TEST: When you click the trash icon next to a question, the question will be removed.
   This removal will persist in the database and when you refresh the page. 
   '''
+  @app.route('/questions/<int:id>', methods=['DELETE'])
+  def delete_question(id):
+    try:
+      question = Question.query.get(id)
+      question.delete()
+      success = True
+      return jsonify({
+        'success': True,
+      })
+    except:
+      abort(422)
 
   '''
   @TODO: 
