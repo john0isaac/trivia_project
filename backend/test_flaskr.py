@@ -34,7 +34,7 @@ class TriviaTestCase(unittest.TestCase):
     Write at least one test for each test for successful operation and for expected errors.
     """
     def test_retrieve_categories(self):
-        """Test retrive categories"""
+        """Test retrieve categories"""
         res = self.client().get('/categories')
         data = json.loads(res.data)
         
@@ -42,6 +42,35 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['categories'])
 
+    def test_405_using_wrong_method_to_retrieve_categories(self):
+        """Test 405 using wrong method to retrieve categories"""
+        res = self.client().patch('/categories')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 405)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'method not allowed')
+
+    def test_retrieve_questions(self):
+        """Test retrieve questions"""
+        res = self.client().get('/questions')
+        data = json.loads(res.data)
+        
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['questions'])
+        self.assertEqual(data['total_questions'], 19)
+        self.assertTrue(data['categories'])
+        self.assertTrue(data['current_category'])
+    
+    def test_405_using_wrong_method_to_retrieve_questions(self):
+        """Test 405 using wrong method to retrieve questions"""
+        res = self.client().patch('/questions')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 405)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'method not allowed')
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
