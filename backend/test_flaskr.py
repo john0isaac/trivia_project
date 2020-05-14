@@ -59,7 +59,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['questions'])
-        self.assertEqual(data['total_questions'], 19)
+        self.assertEqual(data['total_questions'], 18)
         self.assertTrue(data['categories'])
         self.assertTrue(data['current_category'])
     
@@ -74,14 +74,23 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_deleting_a_question(self):
         """test deleting a question"""
-        res = self.client().delete('/questions/8')
+        res = self.client().delete('/questions/4')
         data = json.loads(res.data)
 
-        question = Question.query.filter(Question.id == 8).one_or_none()
+        question = Question.query.filter(Question.id == 4).one_or_none()
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertEqual(question, None)
+    
+    def test_422_deleting_nonexistent_question(self):
+        """test 422 deleting nonexistent question"""
+        res = self.client().delete('/questions/10000')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'unprocessable')
 
 # Make the tests conveniently executable
 if __name__ == "__main__":

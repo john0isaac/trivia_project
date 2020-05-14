@@ -102,7 +102,6 @@ def create_app(test_config=None):
     try:
       question = Question.query.get(id)
       question.delete()
-      success = True
       return jsonify({
         'success': True,
       })
