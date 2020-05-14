@@ -18,12 +18,6 @@ class TriviaTestCase(unittest.TestCase):
         self.database_path = "postgres://{}@{}/{}".format('john','localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
 
-        self.new_question = {
-            'question':'What is the biggest pyramid?',
-            'answer': 'The great pyramid',
-            'category': 4,
-            'difficulty':2
-        }
         # binds the app to the current context
         with self.app.app_context():
             self.db = SQLAlchemy()
@@ -65,7 +59,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['questions'])
-        self.assertEqual(data['total_questions'], 19)
+        self.assertEqual(data['total_questions'], 18)
         self.assertTrue(data['categories'])
         self.assertTrue(data['current_category'])
     
@@ -78,8 +72,8 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'method not allowed')
 
-    def test_delete_question(self):
-        """test delete question"""
+    def test_deleting_a_question(self):
+        """test deleting a question"""
         res = self.client().delete('/questions/4')
         data = json.loads(res.data)
 
@@ -89,31 +83,14 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertEqual(question, None)
     
-    def test_422_delete_nonexistent_question(self):
-        """test 422 delete nonexistent question"""
+    def test_422_deleting_nonexistent_question(self):
+        """test 422 deleting nonexistent question"""
         res = self.client().delete('/questions/10000')
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'unprocessable')
-
-    def test_create_new_question(self):
-        """test create new question"""
-        res = self.client().post('/questions', json=self.new_question)
-        data = json.loads(res.data)
-
-        self.assertEqual(res.status_code, 200)
-        self.assertEqual(data['success'], True)
-
-    def test_405_creation_not_allowed(self):
-        """test 405 creation not allowed"""
-        res = self.client().post('/questions/45', json=self.new_question)
-        data = json.loads(res.data)
-
-        self.assertEqual(res.status_code, 405)
-        self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'method not allowed')
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
