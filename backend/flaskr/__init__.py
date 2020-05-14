@@ -40,23 +40,25 @@ def create_app(test_config=None):
   Create an endpoint to handle GET requests 
   for all available categories.
   '''
-  @app.route('/categories')
+  @app.route('/categories', methods=['GET'])
   def retrieve_categories():
     success = False
+    categories = {}
     try:
       selection = Category.query.order_by(Category.id).all()
-      categories = [catogory.format() for catogory in selection]
+      for category in selection:
+            categories[category.id] = category.type
       success = True
     except:
       success = False
-      abort(404)
+      abort(405)
     finally:
       return jsonify({
         'success': success,
         'categories': categories,
       })
   '''
-  @TODO: 
+  @TODO:DONE
   Create an endpoint to handle GET requests for questions, 
   including pagination (every 10 questions). 
   This endpoint should return a list of questions, 
@@ -67,6 +69,33 @@ def create_app(test_config=None):
   ten questions per page and pagination at the bottom of the screen for three pages.
   Clicking on the page numbers should update the questions. 
   '''
+  @app.route('/questions', methods=['GET'])
+  def retrieve_questions():
+    success = False
+    categories = {}
+    current_category = []
+    try:
+      questions = Question.query.order_by(Question.category).all()
+      current_questions = pagination(request, questions)
+      selection2 = Question.query.with_entities(Question.category).order_by(Question.category).all()
+      for category in selection2:
+          for innerlist in category:
+            current_category.append(innerlist)
+      selection = Category.query.order_by(Category.id).all()
+      for category in selection:
+            categories[category.id] = category.type
+      success = True
+    except:
+      success = False
+      abort(405)
+    finally:
+      return jsonify({
+        'success': success,
+        'questions': current_questions,
+        'total_questions': len(Question.query.all()),
+        'categories': categories,
+        'current_category': current_category
+      })
 
   '''
   @TODO: 
