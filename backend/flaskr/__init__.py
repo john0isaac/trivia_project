@@ -91,7 +91,7 @@ def create_app(test_config=None):
       abort(405)
  
   '''
-  @TODO: 
+  @TODO:DONE
   Create an endpoint to DELETE question using a question ID. 
 
   TEST: When you click the trash icon next to a question, the question will be removed.
@@ -109,7 +109,7 @@ def create_app(test_config=None):
       abort(422)
 
   '''
-  @TODO: 
+  @TODO:DONE
   Create an endpoint to POST a new question, 
   which will require the question and answer text, 
   category, and difficulty score.
