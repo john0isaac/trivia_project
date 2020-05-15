@@ -149,13 +149,31 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['total_questions'])
 
     def test_405_wrong_method_to_get_questions_by_category(self):
-        """test 405 wrong method to get questions by category"""
+        """Test 405 wrong method to get questions by category"""
         res = self.client().post('/categories/1/questions')
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 405)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'method not allowed')
+
+    def test_get_question_to_play(self):
+        """"Test get question to play"""
+        res = self.client().post('/quizzes',  json={"previous_questions": [], "quiz_category": {'id': 1, 'type': 'Science'}})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(len(data['question']))
+
+    def test_400_for_requesting_nonexistent_category(self):
+        """Test 400 for requesting nonexistent category"""
+        res = self.client().post('/quizzes', json={"previous_questions": [], "quiz_category": {'id': 10, 'type': 'Economic'}})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'bad request')
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
