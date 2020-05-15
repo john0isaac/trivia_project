@@ -73,12 +73,14 @@ def create_app(test_config=None):
     try:
       questions = Question.query.order_by(Question.category).all()
       current_questions = paginate_questions(request, questions)
-      selection2 = Question.query.with_entities(Question.category).order_by(Question.category).all()
-      for category in selection2:
+
+      selection = Question.query.with_entities(Question.category).order_by(Question.category).all()
+      for category in selection:
           for innerlist in category:
             current_category.append(innerlist)
-      selection = Category.query.order_by(Category.id).all()
-      for category in selection:
+
+      cat = Category.query.order_by(Category.id).all()
+      for category in cat:
             categories[category.id] = category.type
       return jsonify({
         'success': True,
@@ -147,6 +149,33 @@ def create_app(test_config=None):
   only question that include that string within their question. 
   Try using the word "title" to start. 
   '''
+  @app.route('/questions/search', methods=['POST'])
+  def search_questions():
+    body = request.get_json()
+    search_term = body.get('searchTerm', None)
+    current_category = []
+    try:
+      search = '%{}%'.format(search_term)
+      selection = Question.query.order_by(Question.category).filter(Question.question.ilike(search)).all()
+      questions = paginate_questions(request, selection)
+
+      categories = Question.query.with_entities(Question.category).order_by(Question.category).filter(Question.question.ilike(search)).all()
+      for category in categories:
+        for innerlist in category:
+          current_category.append(innerlist)
+
+      return jsonify({
+          'success': True,
+          'questions': questions,
+          'current_category': current_category,
+          'total_questions': len(selection)
+        })
+    except:
+      abort(422)
+
+    
+    
+        
 
   '''
   @TODO: 
