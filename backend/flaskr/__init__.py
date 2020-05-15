@@ -13,7 +13,7 @@ def paginate_questions(request, selection):
   start = (page - 1) * QUESTIONS_PER_PAGE
   end = start + QUESTIONS_PER_PAGE
 
-  questions = [question.format() for question in selection] 
+  questions = [question.format() for question in selection]
   current_questions = questions[start:end]
 
   return current_questions
@@ -174,7 +174,7 @@ def create_app(test_config=None):
       abort(422)
 
   '''
-  @TODO: 
+  @TODO:DONE
   Create a GET endpoint to get questions based on category. 
 
   TEST: In the "List" tab / main screen, clicking on one of the 
@@ -197,7 +197,7 @@ def create_app(test_config=None):
       abort(405)
 
   '''
-  @TODO: 
+  @TODO:DONE
   Create a POST endpoint to get questions to play the quiz. 
   This endpoint should take category and previous question parameters 
   and return a random questions within the given category, 
@@ -207,6 +207,29 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
   '''
+  @app.route('/quizzes', methods=['POST'])
+  def get_question_to_play():
+    body = request.get_json()
+    previous_questions = body.get('previous_questions', None)
+    quiz_category = body.get('quiz_category', None)
+    try:
+      if quiz_category['id'] == 0:
+        questions = Question.query.order_by(Question.id).all()
+      elif (int(quiz_category['id']) in range(7)) and (int(quiz_category['id']) != 0):
+        questions = Question.query.order_by(Question.id).filter(Question.category==int(quiz_category['id'])).all()
+
+      selection = [question.format() for question in questions if question.id not in previous_questions]
+      if len(selection) == 0: 
+        return jsonify({
+              'success': False,
+              'question': False
+            })
+      return jsonify({
+            'success':True,
+            'question': random.choice(selection)
+          })
+    except:
+      abort(400)
 
   '''
   @TODO:DONE 
