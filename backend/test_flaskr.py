@@ -115,6 +115,28 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'method not allowed')
 
+    def test_get_specefic_questions_With_results(self):
+        """Test get specific questions with results"""
+        res = self.client().post('/questions/search', json={'searchTerm': 'pyramid'})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(len(data['questions']))
+        self.assertTrue(len(data['current_category']))
+        self.assertTrue(data['total_questions'])
+
+    def test_get_specefic_questions_Without_results(self):
+        """Test get specific questions without results"""
+        res = self.client().post('/questions/search', json={'searchTerm': 'jfkf'})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(len(data['questions']), 0)
+        self.assertEqual(len(data['current_category']), 0)
+        self.assertEqual(data['total_questions'], 0)
+
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
